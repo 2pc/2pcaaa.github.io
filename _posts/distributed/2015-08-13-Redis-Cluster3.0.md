@@ -9,19 +9,24 @@ tags : [distributed, redis3.x]
 安装ruby（ruby安装我还是比较烦的，最开始ruby安装复杂，切jekyll需要本地编译而放弃了）
 
 解压修改配置文件redis.conf,然后依次拷贝到其他节点，注意修改端口
-```shell
+
+```java
 port 7000
 cluster-enabled yes
 cluster-config-file nodes.conf
 cluster-node-timeout 5000
 appendonly yes
 ```
+
 此时启动redis
-```shell
+
+```java
 src/redis-server ./redis.conf
 ```
+
 会出现如下日志
-```shell
+
+```java
 18447:M 13 Aug 07:57:37.148 * Increased maximum number of open files to 10032 (it was originally set to 1024).
 18447:M 13 Aug 07:57:37.148 * No cluster configuration found, I'm c8b35a4356445746a9855d384b1c2111eacded8c
                 _._                                                  
@@ -48,8 +53,10 @@ src/redis-server ./redis.conf
 18447:M 13 Aug 07:57:37.158 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
 18447:M 13 Aug 07:57:37.158 * The server is now ready to accept connections on port 10002
 ```
+
 建立集群
-```shell
+
+```java
 # src/redis-trib.rb create --replicas 1 172.16.82.186:10001 172.16.82.186:10002 172.16.82.187:10005 172.16.82.187:10006 172.16.82.188:10003 172.16.82.188:10004
 >>> Creating cluster
 Connecting to node 172.16.82.186:10001: OK
@@ -104,8 +111,10 @@ M: da09b9f765300ab64915685c2e5570da97d28813 172.16.82.188:10004
 >>> Check slots coverage...
 [OK] All 16384 slots covered.
 ```
+
 命令行下各种操作还不熟悉，试了下jedis3.x差不多
-```shell
+
+```java
 Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();  
 jedisClusterNodes.add(new HostAndPort("172.16.82.186", 10001));  
 jedisClusterNodes.add(new HostAndPort("172.16.82.186", 10002));  
