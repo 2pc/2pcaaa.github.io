@@ -8,7 +8,7 @@ tags : [distributed, redis3.x]
 安装ruby（ruby安装我还是比较烦的，最开始ruby安装复杂，切jekyll需要本地编译而放弃了）
 
 解压修改配置文件redis.conf,然后依次拷贝到其他节点，注意修改端口
-```
+```shell
 port 7000
 cluster-enabled yes
 cluster-config-file nodes.conf
@@ -16,11 +16,11 @@ cluster-node-timeout 5000
 appendonly yes
 ```
 此时启动redis
-```
+```shell
 src/redis-server ./redis.conf
 ```
 会出现如下日志
-```
+```shell
 18447:M 13 Aug 07:57:37.148 * Increased maximum number of open files to 10032 (it was originally set to 1024).
 18447:M 13 Aug 07:57:37.148 * No cluster configuration found, I'm c8b35a4356445746a9855d384b1c2111eacded8c
                 _._                                                  
@@ -48,7 +48,7 @@ src/redis-server ./redis.conf
 18447:M 13 Aug 07:57:37.158 * The server is now ready to accept connections on port 10002
 ```
 建立集群
-```
+```shell
 # src/redis-trib.rb create --replicas 1 172.16.82.186:10001 172.16.82.186:10002 172.16.82.187:10005 172.16.82.187:10006 172.16.82.188:10003 172.16.82.188:10004
 >>> Creating cluster
 Connecting to node 172.16.82.186:10001: OK
@@ -104,25 +104,23 @@ M: da09b9f765300ab64915685c2e5570da97d28813 172.16.82.188:10004
 [OK] All 16384 slots covered.
 ```
 命令行下各种操作还不熟悉，试了下jedis3.x差不多
-```
+```shell
 Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();  
-	        jedisClusterNodes.add(new HostAndPort("172.16.82.186", 10001));  
-	        jedisClusterNodes.add(new HostAndPort("172.16.82.186", 10002));  
-	        jedisClusterNodes.add(new HostAndPort("172.16.82.187", 10005));  
-	        jedisClusterNodes.add(new HostAndPort("172.16.82.187", 10006));  
-	        jedisClusterNodes.add(new HostAndPort("172.16.82.188", 10003));  
-	        jedisClusterNodes.add(new HostAndPort("172.16.82.188", 10004));  
-	        JedisCluster jc = new JedisCluster(jedisClusterNodes);  
-	        Random r = new Random(10000000);
-	        System.out.println(new String(jc.get("k".getBytes())));
-	        
-	        for (int i = 0; i < 1000000; i++) {
-	        	String k = r.nextLong()+""+i;
-	        	System.out.println(k);
-	        	String v = r.nextLong()+""+i;
-	        	jc.set(k, v);
-	        	
-			}
-	        System.out.println(jc.del("*".getBytes()));
-	        System.out.println("====");
+jedisClusterNodes.add(new HostAndPort("172.16.82.186", 10001));  
+jedisClusterNodes.add(new HostAndPort("172.16.82.186", 10002));  
+jedisClusterNodes.add(new HostAndPort("172.16.82.187", 10005));  
+jedisClusterNodes.add(new HostAndPort("172.16.82.187", 10006));  
+jedisClusterNodes.add(new HostAndPort("172.16.82.188", 10003));  
+jedisClusterNodes.add(new HostAndPort("172.16.82.188", 10004));  
+JedisCluster jc = new JedisCluster(jedisClusterNodes);  
+Random r = new Random(10000000);
+System.out.println(new String(jc.get("k".getBytes())));
+for (int i = 0; i < 1000000; i++) {
+	String k = r.nextLong()+""+i;
+	System.out.println(k);
+	String v = r.nextLong()+""+i;
+	jc.set(k, v);
+	}
+System.out.println(jc.del("*".getBytes()));
+System.out.println("====");
 ```
